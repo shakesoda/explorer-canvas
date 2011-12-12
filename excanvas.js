@@ -770,19 +770,31 @@ if (!document.createElement('canvas').getContext) {
   contextPrototype.drawImage = function(image, var_args) {
     var dx, dy, dw, dh, sx, sy, sw, sh;
 
-    // to find the original width we overide the width and height
-    var oldRuntimeWidth = image.runtimeStyle.width;
-    var oldRuntimeHeight = image.runtimeStyle.height;
-    image.runtimeStyle.width = 'auto';
-    image.runtimeStyle.height = 'auto';
+	// bad
+	if (image == null)
+		return;
+
+    // to fix new Image() we check the existance of runtimeStyle
+    var rts = image.runtimeStyle;
+	
+     // to find the original width we overide the width and height
+    if(rts) {
+      var oldRuntimeWidth = image.runtimeStyle.width;
+      var oldRuntimeHeight = image.runtimeStyle.height;
+      
+      image.runtimeStyle.width = 'auto';
+      image.runtimeStyle.height = 'auto';	  
+    }
 
     // get the original size
     var w = image.width;
     var h = image.height;
 
     // and remove overides
-    image.runtimeStyle.width = oldRuntimeWidth;
-    image.runtimeStyle.height = oldRuntimeHeight;
+	if (rts) {
+	    image.runtimeStyle.width = oldRuntimeWidth;
+	    image.runtimeStyle.height = oldRuntimeHeight;
+	}
 
     if (arguments.length == 3) {
       dx = arguments[1];
@@ -827,10 +839,14 @@ if (!document.createElement('canvas').getContext) {
                 ' coordorigin="0,0"' ,
                 ' style="width:', W, 'px;height:', H, 'px;position:absolute;');
 
-    // If filters are necessary (rotation exists), create them
+    // If filters are necessary (rotation or globalAlpha exists), create them
     // filters are bog-slow, so only create them if abbsolutely necessary
     // The following check doesn't account for skews (which don't exist
     // in the canvas spec (yet) anyway.
+	var filterList = []
+
+	if (this.globalAlpha < 1.0)
+	    filterList.push("progid:DXImageTransform.Microsoft.Alpha(opacity='"+this.globalAlpha*100+"')");
 
     if (this.m_[0][0] != 1 || this.m_[0][1] ||
         this.m_[1][1] != 1 || this.m_[1][0]) {
@@ -854,13 +870,14 @@ if (!document.createElement('canvas').getContext) {
       max.x = m.max(max.x, c2.x, c3.x, c4.x);
       max.y = m.max(max.y, c2.y, c3.y, c4.y);
 
-      vmlStr.push('padding:0 ', mr(max.x / Z), 'px ', mr(max.y / Z),
-                  'px 0;filter:progid:DXImageTransform.Microsoft.Matrix(',
-                  filter.join(''), ", sizingmethod='clip');");
+      filterList.push('progid:DXImageTransform.Microsoft.Matrix(',filter.join(''), ", sizingmethod='clip')");
 
+      vmlStr.push('padding:0 ', mr(max.x / Z), 'px ', mr(max.y / Z), 'px 0;');
     } else {
       vmlStr.push('top:', mr(d.y / Z), 'px;left:', mr(d.x / Z), 'px;');
     }
+
+	vmlStr.push("filter:", filterList.join("\n"), ";");
 
     vmlStr.push(' ">' ,
                 '<g_vml_:image src="', image.src, '"',
