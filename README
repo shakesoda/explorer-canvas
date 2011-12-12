@@ -4,10 +4,10 @@ Copyright 2006 Google Inc.
 -------------------------------------------------------------------------------
 DESCRIPTION
 
-Firefox, Safari and Opera 9 support the canvas tag to allow 2D command-based 
-drawing operations. ExplorerCanvas brings the same functionality to Internet 
-Explorer; web developers only need to include a single script tag in their 
-existing canvas webpages to enable this support.
+Firefox, Safari, Chrome and Opera 9 support the canvas tag to allow 2D
+command-based drawing operations. ExplorerCanvas brings the same functionality
+to Internet Explorer; web developers only need to include a single script tag
+in their existing canvas webpages to enable this support.
 
 
 -------------------------------------------------------------------------------
