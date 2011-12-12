@@ -21,6 +21,12 @@ add the following code to your page, preferably in the <head> tag.
 If you run into trouble, please look at the included example code to see how
 to best implement this.
 
+If you use a dynamically created canvas element, you can initialize it like so:
+
+canvas = document.createElement('canvas')
+if (typeof G_vmlCanvasManager != 'undefined')
+	canvas = G_vmlCanvasManager.initElement(canvas)
+
 -------------------------------------------------------------------------------
 NOTES
 
